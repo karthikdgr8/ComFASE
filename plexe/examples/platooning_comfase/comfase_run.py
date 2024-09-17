@@ -8,6 +8,16 @@ import numpy
 from datetime import datetime, date, time
 import pandas as pd
 import xml.etree.ElementTree as ET
+from comfase_xml_Parser import main as xml_main
+from comfase_result_classifier import main as classifier_main
+from new_result_classification import main as new_classifier_main
+from pathlib import Path
+import numpy as np
+
+now = datetime.now()
+current_time = now.strftime("%Y-%m-%d %H.%M.%S")
+
+
 
 ##############################################################################################
 # ****************       Function for Attack Injection Run and Output Log         ************
@@ -153,11 +163,12 @@ def config(attackModelName):
                 print("Something went wrong")
                 ##traci.close(False)
                 LIST_Run_status.append('Failed')
+    return attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep
 
 ##############################################################################################
 # *************        Function for Attack Injection Campaign Data Log         ***************
 ##############################################################################################
-def ComFASE_compaign_data_log():
+def ComFASE_compaign_data_log(fileName1):
     # Record data in a csv file
     df = pd.DataFrame(
         {
@@ -169,15 +180,13 @@ def ComFASE_compaign_data_log():
             'Run_status': LIST_Run_status
         }
     )
-    # Current Time
-    now = datetime.now()
-    current_time = now.strftime("%Y-%m-%d %H.%M.%S")
-    df.to_csv("ComFASE Attack Injection Campaign Log _{}.csv".format(current_time))
+    df.to_csv(fileName1)
     print("Current Time =", now)
-##############################################################################################
-# *************                         Main Function                          ***************
-##############################################################################################
-if __name__ == "__main__":
+
+
+def main():
+# Current Time
+  fileName1 = "ComFASE Attack Injection Campaign Log _{}.csv".format(current_time)
   # time.sleep(8)
   # make sure params are in a good state
   configurationFile = ET.parse('configure_campaign.xml').getroot()
@@ -194,7 +203,7 @@ if __name__ == "__main__":
       config(attackModelName)
   elif attackModel.get("Barrage_jamming") == 'true':
       attackModelName = "Barrage_jamming"
-      config(attackModelName)
+      attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep = config(attackModelName)
   elif attackModel.get("Deceptive_jamming") == 'true':
       attackModelName = "Deceptive_jamming"
       config(attackModelName)
@@ -205,4 +214,33 @@ if __name__ == "__main__":
       print('Golden Run is finished!\n\n------------------- Select an attack model in xml file\n\n')
       exit()
   # Log the fault injection campaign data
-  ComFASE_compaign_data_log()
+  ComFASE_compaign_data_log(fileName1)
+  return fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep
+
+##############################################################################################
+# *************                         Main Function                          ***************
+##############################################################################################
+if __name__ == "__main__":
+
+    expTypeName = "Change_Exp_Name_here"
+
+    fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep = main()
+
+    pathObj = Path(str(os.getcwd()) + "/ComFASE_data/")
+    if not pathObj.exists():
+        Path.mkdir(pathObj)
+        print(str(pathObj) + " created")
+
+    fileName2 = xml_main(fileName1)
+    
+    classifier_main(fileName1, fileName2, expTypeName, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep)
+
+    for expTime in np.arange(attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep):
+        print("expTime: " + str(round(expTime,1)))
+        new_classifier_main(fileName1, fileName2, expTypeName, round(expTime,1))
+
+    filePathAbs = str(Path(fileName2).absolute())
+    filePathNew = str(filePathAbs).split(fileName2)[0] + "ComFASE_data/" + fileName1[0:-4]
+    Path(filePathAbs).rename(filePathNew + "/" + str(fileName2))
+
+    exit()
