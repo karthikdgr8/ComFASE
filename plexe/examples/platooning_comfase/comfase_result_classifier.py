@@ -10,7 +10,7 @@ from pathlib import Path
 
 def main(fileName1 = None, fileName2=None, expTypeName = "", attackInitiationStartTime = 20, attackInitiationEndTime = 22.5, attackInitiationTimeStep = 0.2, attackStartValue = 0.2, attackEndValue = 1.01, attackValueStep = 0.2):
 
-    plt.rcParams['figure.figsize'] = 16,7
+    plt.rcParams['figure.figsize'] = 16, 7
     import warnings
     warnings.filterwarnings('ignore')
     #==================================================================================#
@@ -20,7 +20,7 @@ def main(fileName1 = None, fileName2=None, expTypeName = "", attackInitiationSta
     if fileName2!= None:
         DA = pd.read_csv(fileName2)
     else:
-        DA = pd.read_csv('Parsed Accel-Deceleration_All Vehicles_2024-09-16 16.30.14 ParsedData.csv')
+        DA = pd.read_csv('Parsed Accel-Deceleration_All Vehicles_2024-09-23 13.10.44 ParsedData.csv')
     DA.info()
     DA['AttackDuration'] = round(DA['End_time'] - DA['Start_time'] , 2)
     DA['Categories'] = DA['Collision_state']
@@ -60,7 +60,7 @@ def main(fileName1 = None, fileName2=None, expTypeName = "", attackInitiationSta
                 DA['Categories'][index] = 'Negligible'
             elif 5.0 >= decel_min > 1.53: # was >4.2 originally for some reason
                 DA['Categories'][index] = 'Benign'
-            elif 8.0 >= decel_min > 5.0:
+            elif decel_min > 5.0:
                 DA['Categories'][index] = 'Severe_braking'
                 # DA['Categories'][index] = 'Severe'
     #==================================================================================#
@@ -108,10 +108,11 @@ def main(fileName1 = None, fileName2=None, expTypeName = "", attackInitiationSta
 
     sns.set_style('whitegrid')
     fig, ax = plt.subplots()
-    fig.set_size_inches(11.7, 8.27)  # size of A4 paper
+    fig.set_size_inches(11.7, 8.27)  # size of A4 paper 11.7, 8.27
     sns.set_palette(palette="deep")
     # plt.hist(List, bins=30, color={"green", "blue", "red", "black"}, hatch={'*', 'x', 'o', '+'}, stacked=True, rwidth=0.7,label=Label)
-    plt.hist(List, bins=30, stacked=True, rwidth=2.17, color=Colors,
+    print(DA.Categories)
+    plt.hist(List, bins=31, stacked=True, rwidth=2.17, color=Colors,
                 label=Label)
     plt.xlabel('Attack duration [s]', fontsize=22, color='black')
     plt.xticks(fontsize=19)
