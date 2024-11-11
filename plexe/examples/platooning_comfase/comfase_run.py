@@ -18,12 +18,11 @@ now = datetime.now()
 current_time = now.strftime("%Y-%m-%d %H.%M.%S")
 
 
-
 ##############################################################################################
 # ****************       Function for Attack Injection Run and Output Log         ************
 ##############################################################################################
 def ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiationTime, endTime,
-                                                 attackValue, attackOnSender, attackOnReceiver):
+                           attackValue, attackOnSender, attackOnReceiver):
     if attackModelName == "Golden_run":
         os.system(
             './run -u Cmdenv -c %s -r %s '
@@ -37,7 +36,8 @@ def ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiati
             '--*.comfase.injectedPDValue=%ss '
             '--*.comfase.attackOnSender=%s '
             '--*.comfase.attackOnReceiver=%s'
-            % (scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
+            % (
+            scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
     elif attackModelName == "DoS":
         os.system(
             './run -u Cmdenv -c %s -r %s '
@@ -56,7 +56,8 @@ def ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiati
             '--*.comfase.injectedDestructiveness=%smW '
             '--*.comfase.attackOnSender=%s '
             '--*.comfase.attackOnReceiver=%s'
-            % (scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
+            % (
+            scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
     if attackModelName == "Barrage_jamming":
         os.system(
             './run -u Cmdenv -c %s -r %s '
@@ -66,7 +67,8 @@ def ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiati
             '--*.comfase.injectedNoiseValue=%smW '
             '--*.comfase.attackOnSender=%s '
             '--*.comfase.attackOnReceiver=%s'
-            % (scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
+            % (
+            scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
     if attackModelName == "Deceptive_jamming":
         os.system(
             './run -u Cmdenv -c %s -r %s '
@@ -76,7 +78,8 @@ def ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiati
             '--*.comfase.injectedInterferenceValue=%smW '
             '--*.comfase.attackOnSender=%s '
             '--*.comfase.attackOnReceiver=%s'
-            % (scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
+            % (
+            scenario, controller, "true", attackInitiationTime, endTime, attackValue, attackOnSender, attackOnReceiver))
 
 
 ##############################################################################################
@@ -84,16 +87,18 @@ def ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiati
 ##############################################################################################
 configurationFile = ET.parse('configure_campaign.xml').getroot()
 # LISTS TO LOG ATTACK INJECTION DATA
-LIST_Ex_Nr = []                     # EXPERIMENT ID
-LIST_Initiation_time = []            # ATTACK START/ACTIVATION TIME
-LIST_End_time = []                  # ATTACK END TIME
-LIST_Step_number = []               # THE NUMBER OF EXPERIMENT WHEN TARGETING THE TIME STEPS
-LIST_Injected_value = []            # INJECTED PD VALUES
+LIST_Ex_Nr = []  # EXPERIMENT ID
+LIST_Initiation_time = []  # ATTACK START/ACTIVATION TIME
+LIST_End_time = []  # ATTACK END TIME
+LIST_Step_number = []  # THE NUMBER OF EXPERIMENT WHEN TARGETING THE TIME STEPS
+LIST_Injected_value = []  # INJECTED PD VALUES
 LIST_Run_status = []
-Ex_Nr = 0                        # Number of experiment (Ex_Nr)
+Ex_Nr = 0  # Number of experiment (Ex_Nr)
+
+
 def config(attackModelName):
     attackModel = configurationFile.find(str(attackModelName))
-    #delayAttack = str(delayAttackSetup.get("delayAttack"))
+    # delayAttack = str(delayAttackSetup.get("delayAttack"))
     attackInitiationStartTime = float(attackModel.get("attackInitiationStartTime"))
     attackInitiationEndTime = float(attackModel.get("attackInitiationEndTime"))
     attackInitiationTimeStep = float(attackModel.get("attackInitiationTimeStep"))
@@ -111,13 +116,15 @@ def config(attackModelName):
     controller = int(scenarioType.get("Controller"))
     Ex_Nr = 0
     if attackModelName == "Golden_run":
-        ComFASE_experiment_run(scenario, controller,  attackModelName, 0, 0,
-                                                     0, 0, 0)
+        ComFASE_experiment_run(scenario, controller, attackModelName, 0, 0,
+                               0, 0, 0)
     elif attackModelName != "DoS":
-        for attackInitiationTime in numpy.arange(attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep):  # This loop defines the target time to inject attack
+        for attackInitiationTime in numpy.arange(attackInitiationStartTime, attackInitiationEndTime,
+                                                 attackInitiationTimeStep):  # This loop defines the target time to inject attack
             attackInitiationTime = round(attackInitiationTime, 2)
-            Step_number = 0 # Counts the step of the experiment
-            for attackValue in numpy.arange(attackStartValue, attackEndValue, attackValueStep):# Injected_value is a faulty value, this loop defines the target range
+            Step_number = 0  # Counts the step of the experiment
+            for attackValue in numpy.arange(attackStartValue, attackEndValue,
+                                            attackValueStep):  # Injected_value is a faulty value, this loop defines the target range
                 attackValue = round(attackValue, 8)
                 for attackDuration in numpy.arange(attackMinDuration, attackMaxDuration, attackDurationStep):
                     endTime = attackInitiationTime + attackDuration
@@ -133,16 +140,17 @@ def config(attackModelName):
                           '\n================================================================\n')
                     try:
                         ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiationTime, endTime,
-                                                     attackValue, attackOnSender, attackOnReceiver)
+                                               attackValue, attackOnSender, attackOnReceiver)
                         LIST_Run_status.append('Successful')
                     except Exception as err:
                         print("Something went wrong")
                         ##traci.close(False)
                         LIST_Run_status.append('Failed')
     elif attackModelName == "DoS":
-        for attackInitiationTime in numpy.arange(attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep):  # This loop defines the target time to inject attack
+        for attackInitiationTime in numpy.arange(attackInitiationStartTime, attackInitiationEndTime,
+                                                 attackInitiationTimeStep):  # This loop defines the target time to inject attack
             attackInitiationTime = round(attackInitiationTime, 2)
-            Step_number = 0 # Counts the step of the experiment
+            Step_number = 0  # Counts the step of the experiment
             attackValue = round(attackStartValue, 8)
             endTime = 2000000
             Ex_Nr += 1
@@ -157,13 +165,14 @@ def config(attackModelName):
                   '\n================================================================\n')
             try:
                 ComFASE_experiment_run(scenario, controller, attackModelName, attackInitiationTime, endTime,
-                                             attackValue, attackOnSender, attackOnReceiver)
+                                       attackValue, attackOnSender, attackOnReceiver)
                 LIST_Run_status.append('Successful')
             except Exception as err:
                 print("Something went wrong")
                 ##traci.close(False)
                 LIST_Run_status.append('Failed')
-    return attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep
+    return attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep, attackMaxDuration
+
 
 ##############################################################################################
 # *************        Function for Attack Injection Campaign Data Log         ***************
@@ -184,38 +193,40 @@ def ComFASE_compaign_data_log(fileName1):
     print("Current Time =", now)
 
 
-def main():
-# Current Time
-  fileName1 = "ComFASE Attack Injection Campaign Log _{}.csv".format(current_time)
-  # time.sleep(8)
-  # make sure params are in a good state
-  configurationFile = ET.parse('configure_campaign.xml').getroot()
-  attackModel = configurationFile.find('Attack_type')
-  if attackModel.get("Delay") == 'true':
-      attackModelName = "Delay"
-      print('Delay attack: ', attackModelName)
-      config(attackModelName)
-  elif attackModel.get("DoS") == 'true':
-      attackModelName = "DoS"
-      config(attackModelName)
-  elif attackModel.get("Destructive_interference") == 'true':
-      attackModelName = "Destructive_interference"
-      config(attackModelName)
-  elif attackModel.get("Barrage_jamming") == 'true':
-      attackModelName = "Barrage_jamming"
-      attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep = config(attackModelName)
-  elif attackModel.get("Deceptive_jamming") == 'true':
-      attackModelName = "Deceptive_jamming"
-      config(attackModelName)
-  else:
-      config("Golden_run")
-      print('\n\n================================================================'
-            '\n================================================================\n')
-      print('Golden Run is finished!\n\n------------------- Select an attack model in xml file\n\n')
-      exit()
-  # Log the fault injection campaign data
-  ComFASE_compaign_data_log(fileName1)
-  return fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep
+def main(expTypeName='ComFASE Attack Injection Campaign Log '):
+    fileName1 = "{}_{}.csv".format(expTypeName, current_time)
+
+    # time.sleep(8)
+    # make sure params are in a good state
+    configurationFile = ET.parse('configure_campaign.xml').getroot()
+    attackModel = configurationFile.find('Attack_type')
+    if attackModel.get("Delay") == 'true':
+        attackModelName = "Delay"
+        print('Delay attack: ', attackModelName)
+        config(attackModelName)
+    elif attackModel.get("DoS") == 'true':
+        attackModelName = "DoS"
+        config(attackModelName)
+    elif attackModel.get("Destructive_interference") == 'true':
+        attackModelName = "Destructive_interference"
+        config(attackModelName)
+    elif attackModel.get("Barrage_jamming") == 'true':
+        attackModelName = "Barrage_jamming"
+        attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep, attackMaxDuration = config(
+            attackModelName)
+    elif attackModel.get("Deceptive_jamming") == 'true':
+        attackModelName = "Deceptive_jamming"
+        config(attackModelName)
+    else:
+        config("Golden_run")
+        print('\n\n================================================================'
+              '\n================================================================\n')
+        print('Golden Run is finished!\n\n------------------- Select an attack model in xml file\n\n')
+        exit()
+    # Log the fault injection campaign data
+    ComFASE_compaign_data_log(fileName1)
+    return fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep, attackMaxDuration
+
 
 ##############################################################################################
 # *************                         Main Function                          ***************
@@ -223,6 +234,7 @@ def main():
 if __name__ == "__main__":
 
     expTypeName = "Change_Exp_Name_here"
+    fileName1 = None
 
     fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep = main()
 
@@ -232,12 +244,22 @@ if __name__ == "__main__":
         print(str(pathObj) + " created")
 
     fileName2 = xml_main(fileName1)
-    
+
     classifier_main(fileName1, fileName2, expTypeName, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep)
 
+    if fileName1 is None: # Only used if we already have csv files and need to classify without running experiments. Comment line 239 to 248 isf
+        fileName1 = "only_classifier_run.csv"
+        fileName2 = "Parsed Accel-Deceleration_All Vehicles_2024-09-24 15.19.46 ParsedData.csv"
+        configurationFile = ET.parse('configure_campaign.xml').getroot()
+        attackModelName = "Barrage_jamming"
+        attackModel = configurationFile.find(str(attackModelName))
+        attackInitiationStartTime = float(attackModel.get("attackInitiationStartTime"))
+        attackInitiationEndTime = float(attackModel.get("attackInitiationEndTime"))
+        attackInitiationTimeStep = float(attackModel.get("attackInitiationTimeStep"))
+
     for expTime in np.arange(attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep):
-        print("expTime: " + str(round(expTime,1)))
-        new_classifier_main(fileName1, fileName2, expTypeName, round(expTime,1))
+        print("expTime: " + str(round(expTime, 1)))
+        new_classifier_main(fileName1, fileName2, expTypeName, round(expTime, 1))
 
     filePathAbs = str(Path(fileName2).absolute())
     filePathNew = str(filePathAbs).split(fileName2)[0] + "ComFASE_data/" + fileName1[0:-4]
