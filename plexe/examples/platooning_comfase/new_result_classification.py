@@ -10,7 +10,7 @@ import seaborn as sns
 from matplotlib.ticker import PercentFormatter
 from pathlib import Path
 
-def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 20.0):
+def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 17.0, endXAxisOn = 11):
 
 
     plt.rcParams['figure.figsize'] = 16,7
@@ -23,8 +23,8 @@ def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 20.0)
     if fileName2 != None:
         DA = pd.read_csv(fileName2)
     else:
-        DA = pd.read_csv('Parsed Accel-Deceleration_All Vehicles_2024-09-12 14.10.01 ParsedData.csv')
-    DA.info()
+        DA = pd.read_csv('Parsed Accel-Deceleration_All Vehicles_2024-09-20 14.23.41 ParsedData.csv')
+    #DA.info()
     #print("\n\n\n", DA.head(3))
     # Add new columns to include AttackDuration and Categories
     DA['AttackDuration'] = DA['End_time'] - DA['Start_time']
@@ -67,7 +67,7 @@ def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 20.0)
                 DA['Categories'][index] = 'Negligible'
             elif 5.0 >= decel_min > 1.53:
                 DA['Categories'][index] = 'Benign'
-            elif 8.0 >= decel_min > 5.0:
+            elif decel_min > 5.0:
                 DA['Categories'][index] = 'Severe_braking'
                 # DA['Categories'][index] = 'Severe'
     #==================================================================================#
@@ -242,17 +242,34 @@ def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 20.0)
     data_start_time_wanted = DA[DA.Start_time == startTime]
     print('severeBrakingCases@specificStartTime:         ', DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_braking")].count())
     print('severeCollisionCases@specificStartTime:         ', DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision")].count())
-    #data_start_time_wanted = DA[(DA.Start_time == 17.8) & (DA.Affected_car == 'Car 4')]
-    #print('severeCases@specificStartTime: ', DA.Categories[(DA.Start_time == 17.8) & (DA.Categories == "Severe") & (DA.Affected_car == 'Car 4')].count())
+
     print("++++++++++++++++++++++++++++++++++++++++++++++++")
+    #data_start_time_wanted = DA[(DA.Start_time == 17.8) & (DA.Affected_car == 'Car 4')]
+    print('severeCollisionCasesCar1@specificStartTime: ' + str(startTime) + " ", DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 1')].count())
+    print('severeCollisionCasesCar2@specificStartTime: ' + str(startTime) + " ", DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 2')].count())
+    print('severeCollisionCasesCar3@specificStartTime: ' + str(startTime) + " ", DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 3')].count())
+    print('severeCollisionCasesCar4@specificStartTime: ' + str(startTime) + " ", DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 4')].count())
+    print("++++++++++++++++++++++++++++++++++++++++++++++++")
+
+    for startTime in [17.0,17.4,17.8,18.6,19.0,19.8,20.6,21.0,21.4]:
+        this_severe_collision_tot = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision")].count()
+        this_severe_collision_1 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 1')].count()
+        if this_severe_collision_1 != 0:
+            raise Exception("Please modify code, severe collision for Car 1 is a non-zero number")
+        this_severe_collision_2 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 2')].count()
+        this_severe_collision_3 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 3')].count()
+        this_severe_collision_4 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 4')].count()
+
+        print(str(startTime)+"                 & x               & x  & x  & x  & x  & "+str(this_severe_collision_tot)+"                  & -  & "+str(this_severe_collision_2)+"  & "+str(this_severe_collision_3)+" & "+str(this_severe_collision_4)+" \\"+ "\\"+"\\hline")
+
     x = data_start_time_wanted.loc[:, "AttackDuration"].values
     y = data_start_time_wanted.loc[:, "Injected_value"].values
     categories = data_start_time_wanted.loc[:, "Categories"].values
 
 
 
-    print(x)
-    print(y)
+    #print(x)
+    #print(y)
     sns.set_style('whitegrid')
     fig, ax = plt.subplots()
     fig.set_size_inches(11.7, 8.27)  # size of A4 paper
@@ -274,11 +291,11 @@ def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 20.0)
     #y_ticks = np.arange(0, 1.01, 0.025)
     # y_ticks = np.arange(0.01, 1.01, 0.01)
     y_ticks = np.arange(0.2, 1.01, 0.2)
-    print(y_ticks)
+    #print(y_ticks)
     plt.yticks(y_ticks)
     plt.yticks(rotation=25)
     # plt.gcf().autofmt_xdate()
-    x_ticks = np.arange(1, 30.01, 1)
+    x_ticks = np.arange(1, endXAxisOn + 0.01, 1)
     plt.xticks(x_ticks)
     plt.gcf().autofmt_xdate()
     color_patch1 = mpatches.Patch(color='green', label="Non_effective")
