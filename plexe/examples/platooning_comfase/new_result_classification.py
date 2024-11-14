@@ -251,16 +251,16 @@ def main(fileName1 = None, fileName2 = None, expTypeName = "", startTime = 17.0,
     print('severeCollisionCasesCar4@specificStartTime: ' + str(startTime) + " ", DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 4')].count())
     print("++++++++++++++++++++++++++++++++++++++++++++++++")
 
-    for startTime in [17.0,17.4,17.8,18.6,19.0,19.8,20.6,21.0,21.4]:
-        this_severe_collision_tot = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision")].count()
-        this_severe_collision_1 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 1')].count()
+    for instantaneousStartTime in [17.0,17.4,17.8,18.6,19.0,19.8,20.6,21.0,21.4]:
+        this_severe_collision_tot = DA.Categories[(DA.Start_time == instantaneousStartTime) & (DA.Categories == "Severe_collision")].count()
+        this_severe_collision_1 = DA.Categories[(DA.Start_time == instantaneousStartTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 1')].count()
         if this_severe_collision_1 != 0:
             raise Exception("Please modify code, severe collision for Car 1 is a non-zero number")
-        this_severe_collision_2 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 2')].count()
-        this_severe_collision_3 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 3')].count()
-        this_severe_collision_4 = DA.Categories[(DA.Start_time == startTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 4')].count()
+        this_severe_collision_2 = DA.Categories[(DA.Start_time == instantaneousStartTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 2')].count()
+        this_severe_collision_3 = DA.Categories[(DA.Start_time == instantaneousStartTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 3')].count()
+        this_severe_collision_4 = DA.Categories[(DA.Start_time == instantaneousStartTime) & (DA.Categories == "Severe_collision") & (DA.Affected_car == 'Car 4')].count()
 
-        print(str(startTime)+"                 & x               & x  & x  & x  & x  & "+str(this_severe_collision_tot)+"                  & -  & "+str(this_severe_collision_2)+"  & "+str(this_severe_collision_3)+" & "+str(this_severe_collision_4)+" \\"+ "\\"+"\\hline")
+        print(str(instantaneousStartTime)+"                 & x               & x  & x  & x  & x  & "+str(this_severe_collision_tot)+"                  & -  & "+str(this_severe_collision_2)+"  & "+str(this_severe_collision_3)+" & "+str(this_severe_collision_4)+" \\"+ "\\"+"\\hline")
 
     x = data_start_time_wanted.loc[:, "AttackDuration"].values
     y = data_start_time_wanted.loc[:, "Injected_value"].values
