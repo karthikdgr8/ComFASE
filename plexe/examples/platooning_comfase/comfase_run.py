@@ -234,9 +234,9 @@ def main(expTypeName='ComFASE Attack Injection Campaign Log '):
 if __name__ == "__main__":
 
     expTypeName = "Change_Exp_Name_here"
-    fileName1 = None
+    #fileName1 = None
 
-    fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep = main()
+    fileName1, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep, attackMaxDuration = main()
 
     pathObj = Path(str(os.getcwd()) + "/ComFASE_data/")
     if not pathObj.exists():
@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
     classifier_main(fileName1, fileName2, expTypeName, attackInitiationStartTime, attackInitiationEndTime, attackInitiationTimeStep, attackStartValue, attackEndValue, attackValueStep)
 
-    if fileName1 is None: # Only used if we already have csv files and need to classify without running experiments. Comment line 239 to 248 isf
+    if fileName1 is None: # Only used if we already have csv files and need to classify without running experiments. Comment line 239 to 248 isf and uncomment 237
         fileName1 = "only_classifier_run.csv"
         fileName2 = "Parsed Accel-Deceleration_All Vehicles_2024-09-24 15.19.46 ParsedData.csv"
         configurationFile = ET.parse('configure_campaign.xml').getroot()
